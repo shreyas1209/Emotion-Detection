@@ -53,7 +53,7 @@ def train(train_loader, val_loader,epochs,model,loss_function,optimizer):
   history = {"train_accuracy": [], "val_accuracy": [], "loss":[], "lr": []}
 
   optimizer = optimizer
-  scheduler = torch.optim.lr_scheduler.CyclicLR(optimizer, base_lr=0.00025, max_lr=0.01,cycle_momentum=False, step_size_up=5, mode="triangular2")
+  scheduler = torch.optim.lr_scheduler.CyclicLR(optimizer, base_lr=1e-3, max_lr=0.05,cycle_momentum=False, step_size_up=5, mode="triangular2")
   loss_func = loss_function
 
   
