@@ -35,36 +35,41 @@ class emonet(nn.Module):
     
   def __init__(self,output_classes,in_channels=1):
     super(emonet, self).__init__()
-    self.conv1 = conv2d_block(1,32,kernel = 3, pad = 1 )   # 48 x 48
-    #self.conv2 = conv2d_block(16,32,kernel = 3, pad = 1 ) # 48 x 48
-    self.res1 = res_block(32,32) #24 x 24
-    self.pool1 = nn.MaxPool2d(2)
-    self.conv2 = conv2d_block(32,64,kernel = 3, pad = 1 )   # 24 x 24
-    self.conv3 = conv2d_block(64,128,kernel = 3, pad = 1 ) # 24 x 24
-    self.res2 = res_block(128,128) #24 x 24
-    self.pool2 = nn.MaxPool2d(2) 
-    self.conv4 = conv2d_block(128,256,kernel = 3, pad = 1 ,stride_val= 2 )   # 12 x 12
-    self.conv5 = conv2d_block(256,512,kernel = 3, pad = 1 ) #6x6
-    self.res3 = res_block(512,512) #6x6
-    self.pool3 = nn.AvgPool2d(3) #2x2
-    self.fc1 = nn.Linear(512*4,128)
+    self.conv1 = conv2d_block(1,4,kernel = 3, pad = 1 )
+    self.conv2 = conv2d_block(4,8,kernel = 3, pad = 1 )   # 48 x 48
+    self.res1 = res_block(8,8) #48 x 48
+    self.conv3 = conv2d_block(8,16,kernel = 3, pad = 1 )   # 48 x 48
+    self.pool1 = nn.MaxPool2d(2) #24x24
+    self.conv4 = conv2d_block(16,32,kernel = 3, pad = 1 ) # 24 x 24
+    self.pool2 = nn.MaxPool2d(2) #12X12
+    self.res2 = res_block(32,32) #12x12
+    self.conv5 = conv2d_block(32,64,kernel = 3, pad = 1  )   #  12x12
+    self.pool3 = nn.MaxPool2d(2) #6x6
+    self.conv6 = conv2d_block(64,128,kernel = 3, pad = 1 ) #6x6
+    self.pool4 = nn.MaxPool2d(2) #3x3
+    self.res3 = res_block(128,128) #3x3
+    self.pool5 = nn.AvgPool2d(3) #1x1
     self.output = nn.Linear(128,output_classes)
 
   def forward(self,x):
-    #x = self.conv1(x)
+    
     x = self.conv1(x)
-    x = F.relu(self.res1(x)+x)
-    x = self.pool1(x)
     x = self.conv2(x)
+    x = F.relu(self.res1(x)+x)
     x = self.conv3(x)
-    x = F.relu(self.res2(x)+x)
-    x = self.pool2(x)
+    x = self.pool1(x)
     x = self.conv4(x)
+    x = self.pool2(x)
+    x = F.relu(self.res2(x)+x)
     x = self.conv5(x)
-    x = F.relu(self.res3(x)+x)
     x = self.pool3(x)
+    x = self.conv6(x)
+    x = self.pool4(x)
+    x = F.relu(self.res3(x)+x)
+    x = self.pool5(x)
     x = x.view(-1, x.shape[1]*x.shape[2]*x.shape[3])
-    x = F.relu(self.fc1(x))
     x = self.output(x)
     return x
+
+
 
